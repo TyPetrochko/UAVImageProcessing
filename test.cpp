@@ -5,7 +5,7 @@ using namespace cv;
 
 int main(int argc, char** argv )
 {
-    if ( argc != 2 )
+    if ( argc != 2 || 0)
     {
         printf("usage: DisplayImage.out <Image_Path>\n");
         return -1;
@@ -26,3 +26,4 @@ int main(int argc, char** argv )
 
     return 0;
 }
+
