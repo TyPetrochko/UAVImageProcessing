@@ -221,6 +221,57 @@ int experimental(){
 	return 0;
 }
 
+int lineDetect(char * image_path){
+	Mat source_gray;
+	Mat dest, edges;
+
+	cvNamedWindow("Camera_Output", 1);    //Create window
+
+	//cvShowImage("Camera_Output", frame);   //Show image frames on created window
+
+	Mat source = imread(image_path);
+
+	if (!source.data)
+	{
+		cout << "You suck \n";
+		return -1;
+	}
+
+	dst.create(source.size(), source.type());
+
+	/// Convert the image to grayscale
+	cvtColor(source, source_gray, CV_BGR2GRAY);
+
+	/// Create a window
+	namedWindow(window_name, CV_WINDOW_AUTOSIZE);
+
+	/// Create a Trackbar for user to enter threshold
+	createTrackbar("Min Threshold:", window_name, &lowThreshold, max_lowThreshold, NULL);
+
+
+
+	/// Show the image...
+
+	/// Reduce noise with a kernel 3x3
+	blur(source_gray, edges, Size(3, 3));
+
+	/// Canny detector
+	Canny(edges, edges, lowThreshold, lowThreshold*ratio, kernel_size);
+
+	/// Using Canny's output as a mask, we display our result
+	dest = Scalar::all(0);
+
+	source.copyTo(dest, edges);
+	
+	imwrite("out.jpg", dest);
+
+	imshow(window_name, dest);
+
+
+	waitKey(0);
+	cvDestroyWindow("Camera_Output"); //Destroy Window
+	return 0;
+}
 
 int main(int argc, char** argv)
 {
@@ -234,7 +285,12 @@ int main(int argc, char** argv)
 
 	*/
 	//cout << system("cd ../Tesseract-OCR && tesseract.exe test.jpg output && more output.txt");
-	//cin.ignore();
-	return experimental();
+	//cin.ignore()
+	
+	if(argc == 2) {
+		lineDetect(argv[1]);
+	}else{
+		return experimental();
+	}
 	
 }
