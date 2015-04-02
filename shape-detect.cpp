@@ -39,12 +39,13 @@ void setLabel(cv::Mat& im, const std::string label, std::vector<cv::Point>& cont
 	cv::putText(im, label, pt, fontface, scale, CV_RGB(0,0,0), thickness, 8);
 }
 
-int main(int argc, char ** argv)
+void shapeDetect(cv::Mat img)
 {
 	//cv::Mat src = cv::imread("polygon.png");
-	cv::Mat src = cv::imread(argv[1]);
+	//cv::Mat src = cv::imread(argv[1]);
+	cv::Mat src = img;
 	if (src.empty())
-		return -1;
+		exit(0);
 
 	// Convert to grayscale
 	cv::Mat gray;
@@ -59,7 +60,6 @@ int main(int argc, char ** argv)
 	cv::findContours(bw.clone(), contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
 
 	std::vector<cv::Point> approx;
-	cv::Mat dst = src.clone();
 
 	for (int i = 0; i < contours.size(); i++)
 	{
@@ -73,7 +73,7 @@ int main(int argc, char ** argv)
 
 		if (approx.size() == 3)
 		{
-			setLabel(dst, "TRI", contours[i]);    // Triangles
+			setLabel(src, "TRI", contours[i]);    // Triangles
 		}
 		else if (approx.size() >= 4 && approx.size() <= 6)
 		{
@@ -95,11 +95,11 @@ int main(int argc, char ** argv)
 			// Use the degrees obtained above and the number of vertices
 			// to determine the shape of the contour
 			if (vtc == 4 && mincos >= -0.1 && maxcos <= 0.3)
-				setLabel(dst, "RECT", contours[i]);
+				setLabel(src, "RECT", contours[i]);
 			else if (vtc == 5 && mincos >= -0.34 && maxcos <= -0.27)
-				setLabel(dst, "PENTA", contours[i]);
+				setLabel(src, "PENTA", contours[i]);
 			else if (vtc == 6 && mincos >= -0.55 && maxcos <= -0.45)
-				setLabel(dst, "HEXA", contours[i]);
+				setLabel(src, "HEXA", contours[i]);
 		}
 		else
 		{
@@ -110,13 +110,8 @@ int main(int argc, char ** argv)
 
 			if (std::abs(1 - ((double)r.width / r.height)) <= 0.2 &&
 			    std::abs(1 - (area / (CV_PI * std::pow(radius, 2)))) <= 0.2)
-				setLabel(dst, "CIR", contours[i]);
+				setLabel(src, "CIR", contours[i]);
 		}
 	}
-
-	cv::imshow("src", src);
-	cv::imshow("dst", dst);
-	cv::waitKey(0);
-	return 0;
 }
 
